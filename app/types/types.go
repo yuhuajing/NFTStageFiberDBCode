@@ -11,3 +11,9 @@ type ErrorResponse struct {
 	Success bool        `json:"success" default:"false"`
 	Data    interface{} `json:"data"`
 }
+
+type ResResponse struct {
+	Error   string      `json:"error"`
+	Success bool        `json:"success" default:"false"`
+	Data    interface{} `json:"data"`
+}

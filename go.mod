@@ -12,6 +12,8 @@ require (
 	github.com/swaggo/swag v1.16.2
 )
 
+require github.com/MicahParks/keyfunc/v2 v2.1.0 // indirect
+
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
@@ -31,9 +33,12 @@ require (
 	github.com/go-openapi/spec v0.20.4 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
+	github.com/gofiber/contrib/jwt v1.0.7
+	github.com/golang-jwt/jwt/v5 v5.1.0
 	github.com/google/uuid v1.4.0 // indirect
 	github.com/holiman/uint256 v1.2.3 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
+	github.com/kataras/jwt v0.1.11
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

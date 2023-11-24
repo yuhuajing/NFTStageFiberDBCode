@@ -18,19 +18,19 @@ import (
 
 func Server() {
 	limitConfig := limiter.Config{
-		Max:        10,
-		Expiration: 1 * time.Minute,
-		KeyGenerator: func(c *fiber.Ctx) string {
-			return c.IP()
-		},
-		LimitReached: func(c *fiber.Ctx) error {
-			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
-				"error":  "Too many request",
-				"status": false,
-				"data":   nil,
-			})
+		Max:        100,
+		Expiration: 10 * time.Minute,
+		// KeyGenerator: func(c *fiber.Ctx) string {
+		// 	return c.IP()
+		// },
+		// LimitReached: func(c *fiber.Ctx) error {
+		// 	return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+		// 		"error":  "Too many request",
+		// 		"status": false,
+		// 		"data":   nil,
+		// 	})
 
-		},
+		// },
 		SkipFailedRequests:     false,
 		SkipSuccessfulRequests: false,
 		LimiterMiddleware:      limiter.FixedWindow{},
@@ -47,7 +47,7 @@ func Server() {
 	}))
 
 	app.Get("/swagger/*", swagger.HandlerDefault)
-	routes.SigRoute(app)
+	routes.LaunchpadRoute(app)
 
 	serverAddr := fmt.Sprintf("%s:%d", appCfg.Host, appCfg.Port)
 	if err := app.Listen(serverAddr); err != nil {

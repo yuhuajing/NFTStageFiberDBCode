@@ -2,6 +2,7 @@ package traderjoe
 
 import (
 	"crypto/ecdsa"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"main/app/types"
@@ -13,19 +14,36 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 
+	//veriJwt "github.com/golang-jwt/jwt/v5"
+	//"github.com/kataras/jwt"
+	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/utils"
 	solsha3 "github.com/miguelmota/go-solidity-sha3"
 )
 
 func Signature(c *fiber.Ctx) error {
+	user := c.Locals("user") //.(*jwt.Token)
+
+	if user == nil {
+		return nil
+	}
+	fmt.Println(user)
+	claims := user.(*jwt.Token)
+	storeClaim := claims.Claims.(jwt.MapClaims)
+	fmt.Println(storeClaim["name"])
+	fmt.Println(storeClaim["uid"])
+
 	payload := &types.SigValue{}
 	// if err := handler.ParseBody(c, payload); err != nil {
 	// 	return err
 	// }
 	if err := c.BodyParser(payload); err != nil {
 		return c.Status(400).JSON(types.ErrorResponse{
-			Error: err.Error(),
+			Error:   err.Error(),
+			Success: false,
+			Data:    "",
 		})
 	}
 	scaddress := common.HexToAddress(payload.Scaddress)
@@ -37,11 +55,30 @@ func Signature(c *fiber.Ctx) error {
 	requestId := utils.UUIDv4()
 	packed := Abiencode(scaddress, sender, cosigner, qty, chainId, requestId, timestamp)
 	res := hexutil.Encode(packed)[:2] + hexutil.Encode(packed)[66:]
-	///auth/login
 
-	//fmt.Println(fmt.Sprintf("scaddress:%s sender=%s, cosigner=%s, qty=%d, chainId=%d,timestamp=%d,rid=%s", scaddress, sender, cosigner, qty, chainId, timestamp, requestId))
-	return c.SendString(res)
+	fmt.Println(fmt.Sprintf("scaddress:%s sender=%s, cosigner=%s, qty=%d, chainId=%d,timestamp=%d,rid=%s", scaddress, sender, cosigner, qty, chainId, timestamp, requestId))
+	return c.Status(200).JSON(types.ResResponse{
+		Error:   "",
+		Success: true,
+		Data:    res,
+	})
 	//return handler.SendResponse(c, res)
+}
+
+func Token(c *fiber.Ctx) error {
+	myClaims := jwt.MapClaims{
+		"name": "John Doe",
+		"uid":  utils.UUIDv4(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, myClaims)
+	t, err := token.SignedString([]byte("secret"))
+
+	//token, err := jwt.Sign(jwt.HS256, []byte("secret"), myClaims, jwt.MaxAge(15*time.Minute))
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	c.Locals("user", myClaims)
+	return c.JSON(fiber.Map{"token": t})
 }
 
 type MyData struct {
